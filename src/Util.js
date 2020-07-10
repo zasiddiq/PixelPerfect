@@ -1,5 +1,5 @@
-let canvasHeight = 50;
-let canvasWidth = 110;
+let canvasHeight = 80;
+let canvasWidth = 150;
 
 let undoList = [];
 let redoList = [];
@@ -22,6 +22,9 @@ export const rgbToHex = (r, g, b) => {
 const arrayUnique = (arr) => {
   return(arr.filter((ar, index, self) => self.findIndex(t => t.color === ar.color && t.locationx === ar.locationx && t.locationy === ar.locationy) === index))
 };
+const arrayUniqueFill = (arr) => {
+  return(arr.filter((ar, index, self) => self.findIndex(t => t.x === ar.x && t.y === ar.y) === index))
+};
 export const toolHandler = (e, canvasRef, canvasWidth, canvasHeight, tool, colorSelect, size) => {
   const canvas = canvasRef.current;
   const canvasId = document.getElementById("canvas");
@@ -32,7 +35,7 @@ export const toolHandler = (e, canvasRef, canvasWidth, canvasHeight, tool, color
     case 'fill':
       if (location.x>=0 && location.x<canvasWidth  && location.y>=0 && location.y<canvasHeight) {
         if (colorSelect !== getColor(location, ctx, size)){
-          fillStep(location, colorSelect, size, ctx);
+          floodFill(location, colorSelect, size, ctx)
         }
       }
       return {colorSelect, tool};
@@ -84,29 +87,38 @@ const getColor = (location, ctx, size) => {
   const p = ctx.getImageData(location.x*size, location.y*size, 1, 1).data;
   return "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
 };
-const fillStep = (location, selected_color, size, ctx) => {
-  const initcolor = getColor(location, ctx, size);
-  ctx.fillStyle = selected_color;
-  ctx.fillRect(location.x*size, location.y*size, size, size);
 
-  const leftLocation = {x: location.x-1, y:location.y};
-  const leftColor = getColor(leftLocation, ctx, size);
-  if (leftLocation.x >= 0 && leftColor===initcolor) {
-    fillStep(leftLocation, selected_color, size, ctx)
-  }
-  const rightLocation = {x: location.x+1, y:location.y};
-  const rightColor = getColor(rightLocation, ctx, size);
-  if (rightLocation.x < (canvasWidth) && !(location.x===canvasWidth) && rightColor===initcolor) {
-    fillStep(rightLocation, selected_color, size, ctx)
-  }
-  const upLocation = {x: location.x, y:location.y-1};
-  const upColor = getColor(upLocation, ctx, size);
-  if (upLocation.y >= 0 && upColor===initcolor) {
-    fillStep(upLocation, selected_color, size, ctx)
-  }
-  const downLocation = {x: location.x, y:location.y+1};
-  const downColor = getColor(downLocation, ctx, size);
-  if (downLocation.y < (canvasHeight) && !(location.y===canvasHeight) && downColor===initcolor) {
-    fillStep(downLocation, selected_color, size, ctx)
+const floodFill = (location, colorSelect, size, ctx) => {
+  let q = [];
+  q.push(location);
+  q.push(location);q.push(location);q.push(location);
+  while (q.length>0) {
+    q = arrayUniqueFill(q);
+    const loc = q.shift();
+    const initcolor = getColor(loc, ctx, size);
+    ctx.fillStyle = colorSelect;
+    ctx.fillRect(loc.x*size, loc.y*size, size, size);
+
+    const leftLocation = {x: loc.x-1, y:loc.y};
+    const leftColor = getColor(leftLocation, ctx, size);
+    const rightLocation = {x: loc.x+1, y: loc.y};
+    const rightColor = getColor(rightLocation, ctx, size);
+    const upLocation = {x: loc.x, y: loc.y-1};
+    const upColor = getColor(upLocation, ctx, size);
+    const downLocation = {x: loc.x, y: loc.y+1};
+    const downColor = getColor(downLocation, ctx, size);
+
+    if (leftLocation.x >= 0 && leftColor===initcolor) {
+      q.push(leftLocation);
+    }
+    if (rightLocation.x < (canvasWidth) && !(location.x===canvasWidth) && rightColor===initcolor) {
+      q.push(rightLocation);
+    }
+    if (upLocation.y >= 0 && upColor===initcolor) {
+      q.push(upLocation);
+    }
+    if(downLocation.y < (canvasHeight) && !(location.y===canvasHeight) && downColor===initcolor) {
+      q.push(downLocation);
+    }
   }
 };

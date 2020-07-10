@@ -6,8 +6,8 @@ import { Navbar } from 'react-bootstrap'
 import {toolHandler, save, clear} from './Util';
 
 const size = 10;
-const width = 110;
-const height = 50;
+const width = 150;
+const height = 80;
 const canvasWidth = size * width;
 const canvasHeight = size * height;
 let colorSelect = '#ff0000';
@@ -83,7 +83,6 @@ const App = () => {
         ctx.beginPath();
         ctx.moveTo(x*(size), 0);
         ctx.lineTo(x*(size), canvasHeight);
-        console.log(x*(size), 0);
         ctx.strokeStyle = "#000000";
         ctx.stroke();
       }
