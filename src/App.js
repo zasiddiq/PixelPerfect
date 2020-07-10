@@ -125,7 +125,7 @@ const App = () => {
             <span>
               <Button variant="warning" className="padding" onClick={(e) => {undoButton(e)}}>Undo</Button>
               <Button variant="success" className="padding" onClick={(e) => {redoButton(e)}}>Redo</Button>
-              <Button variant="info" className="padding" onClick={() => {save()}} ><a id="saveButton" download="my-image">Save Image</a></Button>
+              <a id="saveButton" download="my-image"><Button variant="info" className="padding" onClick={() => {save()}} >Save Image</Button></a>
             </span>
           </div>
         </div>
