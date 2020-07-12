@@ -87,7 +87,7 @@ const App = () => {
     const touch = e.touches[0];
     // console.log(e.touches[0])
     const location = { x: Math.floor((touch.clientX - rect.left) / size), y: Math.floor((touch.clientY - rect.top) / size) }
-    alert('touch'+location.x+ ','+location.y)
+    // alert('touch'+location.x+ ','+location.y)
     const col = getColor(location, params)
     console.log('touch start',location)
     isDrawing = true
@@ -127,7 +127,7 @@ const App = () => {
   const mouseDown = (e) => {
     const location = { x: Math.floor((e.clientX - rect.left) / size), y: Math.floor((e.clientY - rect.top) / size) }
     const col = getColor(location, params)
-    alert('mouse'+location.x+ ','+location.y)
+    // alert('mouse'+location.x+ ','+location.y)
     isDrawing = true
     // console.log('mouse',location, ctx, e)
     if (!(col===colorSelect) || tool==='erase') {
