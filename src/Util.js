@@ -1,124 +1,140 @@
-let canvasHeight = 80;
-let canvasWidth = 150;
+let undoList = []
+let redoList = []
 
-let undoList = [];
-let redoList = [];
-
-export const clear = (canvasRef, canvasWidth, canvasHeight) => {
-  const canvas = canvasRef.current;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0, canvasWidth, canvasHeight);
-  return 'draw';
-};
+export const clear = (params) => {
+  params.ctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight)
+  return 'draw'
+}
 export const save = () => {
-  const canvas = document.getElementById('canvas');
-  document.getElementById('saveButton').href = canvas.toDataURL();
-};
+  const canvas = document.getElementById('canvas')
+  document.getElementById('saveButton').href = canvas.toDataURL()
+}
 export const rgbToHex = (r, g, b) => {
-  if (r > 255 || g > 255 || b > 255)
-    throw "Invalid color component";
-  return ((r << 16) | (g << 8) | b).toString(16);
-};
-const arrayUnique = (arr) => {
-  return(arr.filter((ar, index, self) => self.findIndex(t => t.color === ar.color && t.locationx === ar.locationx && t.locationy === ar.locationy) === index))
-};
+  if (r > 255 || g > 255 || b > 255) { throw 'Invalid color component' }
+  return ((r << 16) | (g << 8) | b).toString(16)
+}
 const arrayUniqueFill = (arr) => {
-  return(arr.filter((ar, index, self) => self.findIndex(t => t.x === ar.x && t.y === ar.y) === index))
-};
-export const toolHandler = (e, canvasRef, canvasWidth, canvasHeight, tool, colorSelect, size) => {
-  const canvas = canvasRef.current;
-  const canvasId = document.getElementById("canvas");
-  const ctx = canvas.getContext('2d');
-  const rect = canvasId.getBoundingClientRect();
-  const location = {x: Math.floor((e.clientX - rect.left)/size), y:  Math.floor((e.clientY - rect.top)/size) };
+  return (arr.filter((ar, index, self) => self.findIndex(t => t.x === ar.x && t.y === ar.y) === index))
+}
+export const toolHandler = (e, params, tool, colorSelect) => {
+  const location = { x: Math.floor((e.clientX - params.rect.left) / params.size), y: Math.floor((e.clientY - params.rect.top) / params.size) }
   switch (tool) {
     case 'fill':
-      if (location.x>=0 && location.x<canvasWidth  && location.y>=0 && location.y<canvasHeight) {
-        if (colorSelect !== getColor(location, ctx, size)){
-          floodFill(location, colorSelect, size, ctx)
+      if (location.x >= 0 && location.x < params.canvasWidth && location.y >= 0 && location.y < params.canvasHeight) {
+        if (colorSelect !== getColor(location, params)) {
+          undoList.push({ color: getColor(location, params), prevColor: colorSelect, location, alpha: getAlpha(location, params), fill: true})
+          floodFill(location, colorSelect, params, params.canvasWidth/params.size, params.canvasHeight/params.size)
         }
       }
-      return {colorSelect, tool};
+      return { colorSelect, tool }
     case 'draw':
-      undoList.push({color: getColor(location, ctx, size), locationx: location.x, locationy: location.y});
+      undoList.push({ color: getColor(location, params), prevColor: colorSelect, location, alpha: getAlpha(location, params)})
 
-      ctx.fillStyle = colorSelect;
-      ctx.fillRect(location.x*size, location.y*size, size, size);
-      return {colorSelect, tool};
+      params.ctx.fillStyle = colorSelect
+      params.ctx.fillRect(location.x * params.size, location.y * params.size, params.size, params.size)
+      return { colorSelect, tool }
     case 'undo':
       if (undoList.length > 0) {
-        undoList = arrayUnique(undoList);
-        ctx.fillStyle = undoList[undoList.length-1].color;
-        ctx.fillRect(undoList[undoList.length-1].locationx*size, undoList[undoList.length-1].locationy*size, size, size);
-        redoList.push({color: undoList[undoList.length-1].color, locationx: undoList[undoList.length-1].locationx, locationy: undoList[undoList.length-1].locationy});
-        undoList.pop();
-        ctx.fillStyle = undoList[undoList.length-1].color;
-        ctx.fillRect(undoList[undoList.length-1].locationx*size, undoList[undoList.length-1].locationy*size, size, size);
-        redoList.push({color: undoList[undoList.length-1].color, locationx: undoList[undoList.length-1].locationx, locationy: undoList[undoList.length-1].locationy});
-        undoList.pop();
+        if (undoList[undoList.length-1].fill) {
+          if (undoList[undoList.length-1].alpha) {
+            floodFill(undoList[undoList.length - 1].location, undoList[undoList.length - 1].color, params, params.canvasWidth / params.size, params.canvasHeight / params.size)
+          } else {
+            floodFill(undoList[undoList.length - 1].location, "alpha", params, params.canvasWidth / params.size, params.canvasHeight / params.size)
+          }
+          undoList.pop()
+          tool = 'draw'
+          return { colorSelect, tool }
+        }
+        else if (undoList[undoList.length-1].alpha) {
+          params.ctx.fillStyle = undoList[undoList.length - 1].color
+          params.ctx.fillRect(undoList[undoList.length - 1].location.x * params.size, undoList[undoList.length - 1].location.y * params.size, params.size, params.size)
+          redoList.push({color: undoList[undoList.length-1].prevColor, location: undoList[undoList.length-1].location, alpha: undoList[undoList.length-1].alpha});
+        } else {
+          params.ctx.clearRect(undoList[undoList.length - 1].location.x * params.size, undoList[undoList.length - 1].location.y * params.size, params.size, params.size)
+          redoList.push({color: undoList[undoList.length-1].prevColor, location: undoList[undoList.length-1].location, alpha: 0});
+        }
+        undoList.pop()
       }
-      tool='draw';
-      return {colorSelect, tool};
+      tool = 'draw'
+      return { colorSelect, tool }
     case 'redo':
       if (redoList.length > 0) {
-        redoList = arrayUnique(redoList);
-        ctx.fillStyle = redoList[redoList.length-1].color;
-        ctx.fillRect(redoList[redoList.length-1].locationx*size, redoList[redoList.length-1].locationy*size, size, size);
-        redoList.pop();
-        ctx.fillStyle = redoList[redoList.length-1].color;
-        ctx.fillRect(redoList[redoList.length-1].locationx*size, redoList[redoList.length-1].locationy*size, size, size);
+        params.ctx.fillStyle = redoList[redoList.length - 1].color;
+        params.ctx.fillRect(redoList[redoList.length - 1].location.x * params.size, redoList[redoList.length - 1].location.y * params.size, params.size, params.size);
         redoList.pop();
       }
-      tool='draw';
-      return {colorSelect, tool};
+      tool = 'draw'
+      return { colorSelect, tool }
+    case 'mirror':
+      let mirX = (params.canvasWidth/params.size) - location.x -1
+      undoList.push({ color: getColor(location, params), prevColor: colorSelect, location })
+      undoList.push({ color: getColor(location, params), prevColor: colorSelect, location: {x: mirX, y: location.y} })
+      params.ctx.fillStyle = colorSelect
+      params.ctx.fillRect(location.x * params.size, location.y * params.size, params.size, params.size)
+      params.ctx.fillRect(mirX * params.size, location.y * params.size, params.size, params.size)
+
+      return { colorSelect, tool }
     case 'erase':
-      ctx.clearRect(location.x*size, location.y*size, size, size);
-      return {colorSelect, tool};
+      const alpha = getAlpha(location, params)
+      if (alpha) {
+        undoList.push({ color: getColor(location, params), prevColor: colorSelect, location, alpha})
+        params.ctx.clearRect(location.x * params.size, location.y * params.size, params.size, params.size)
+      }
+      return { colorSelect, tool }
     case 'picker':
-      colorSelect=getColor(location, ctx, size);
-      tool='draw';
-      return {colorSelect, tool};
+      colorSelect = getAlpha(location, params)
+      tool = 'draw'
+      return { colorSelect, tool }
     default:
-      ctx.clearRect(0,0, canvasWidth, canvasHeight);
-      return {colorSelect, tool};
+      params.ctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight)
+      return { colorSelect, tool }
   }
+}
+export const getColor = (location, params) => {
+  const p = params.ctx.getImageData(location.x * params.size, location.y * params.size, 1, 1).data
+  return '#' + ('000000' + rgbToHex(p[0], p[1], p[2])).slice(-6)
 };
-const getColor = (location, ctx, size) => {
-  const p = ctx.getImageData(location.x*size, location.y*size, 1, 1).data;
-  return "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
+
+export const getAlpha = (location, params) => {
+  return params.ctx.getImageData(location.x * params.size, location.y * params.size, 1, 1).data[3];
 };
 
-const floodFill = (location, colorSelect, size, ctx) => {
-  let q = [];
-  q.push(location);
-  q.push(location);q.push(location);q.push(location);
-  while (q.length>0) {
-    q = arrayUniqueFill(q);
-    const loc = q.shift();
-    const initcolor = getColor(loc, ctx, size);
-    ctx.fillStyle = colorSelect;
-    ctx.fillRect(loc.x*size, loc.y*size, size, size);
+const floodFill = (location, colorSelect, params, canvasWidth, canvasHeight) => {
+  let q = []
+  q.push(location)
+  q.push(location); q.push(location); q.push(location)
+  while (q.length > 0) {
+    q = arrayUniqueFill(q)
+    const loc = q.shift()
+    const initcolor = getColor(loc, params)
+    if (colorSelect === "alpha") {
+      params.ctx.clearRect(loc.x * params.size, loc.y * params.size, params.size, params.size)
+    } else {
+      params.ctx.fillStyle = colorSelect
+      params.ctx.fillRect(loc.x * params.size, loc.y * params.size, params.size, params.size)
+    }
 
-    const leftLocation = {x: loc.x-1, y:loc.y};
-    const leftColor = getColor(leftLocation, ctx, size);
-    const rightLocation = {x: loc.x+1, y: loc.y};
-    const rightColor = getColor(rightLocation, ctx, size);
-    const upLocation = {x: loc.x, y: loc.y-1};
-    const upColor = getColor(upLocation, ctx, size);
-    const downLocation = {x: loc.x, y: loc.y+1};
-    const downColor = getColor(downLocation, ctx, size);
 
-    if (leftLocation.x >= 0 && leftColor===initcolor) {
-      q.push(leftLocation);
+    const leftLocation = { x: loc.x - 1, y: loc.y }
+    const leftColor = getColor(leftLocation, params)
+    const rightLocation = { x: loc.x + 1, y: loc.y }
+    const rightColor = getColor(rightLocation, params)
+    const upLocation = { x: loc.x, y: loc.y - 1 }
+    const upColor = getColor(upLocation, params)
+    const downLocation = { x: loc.x, y: loc.y + 1 }
+    const downColor = getColor(downLocation, params)
+
+    if (leftLocation.x >= 0 && leftColor === initcolor) {
+      q.push(leftLocation)
     }
-    if (rightLocation.x < (canvasWidth) && !(location.x===canvasWidth) && rightColor===initcolor) {
-      q.push(rightLocation);
+    if (rightLocation.x < (canvasWidth) && !(location.x === canvasWidth) && rightColor === initcolor) {
+      q.push(rightLocation)
     }
-    if (upLocation.y >= 0 && upColor===initcolor) {
-      q.push(upLocation);
+    if (upLocation.y >= 0 && upColor === initcolor) {
+      q.push(upLocation)
     }
-    if(downLocation.y < (canvasHeight) && !(location.y===canvasHeight) && downColor===initcolor) {
-      q.push(downLocation);
+    if (downLocation.y < (canvasHeight) && !(location.y === canvasHeight) && downColor === initcolor) {
+      q.push(downLocation)
     }
   }
-};
+}
