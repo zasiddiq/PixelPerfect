@@ -17,7 +17,7 @@ const arrayUniqueFill = (arr) => {
   return (arr.filter((ar, index, self) => self.findIndex(t => t.x === ar.x && t.y === ar.y) === index))
 }
 export const toolHandler = (e, params, tool, colorSelect) => {
-  const location = { x: Math.floor((e.clientX - params.rect.left) / params.size), y: Math.floor((e.clientY - params.rect.top) / params.size) }
+  const location = { x: Math.floor((e.pageX - (window.pageXOffset + params.canvas.getBoundingClientRect().left)) / params.size), y: Math.floor((e.pageY - (window.pageYOffset + params.canvas.getBoundingClientRect().top)) / params.size) }
   switch (tool) {
     case 'fill':
       if (location.x >= 0 && location.x < params.canvasWidth && location.y >= 0 && location.y < params.canvasHeight) {
