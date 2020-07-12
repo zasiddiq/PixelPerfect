@@ -10,9 +10,7 @@ const width = 16
 const height = 16
 const canvasWidth = size * width
 const canvasHeight = size * height
-let colorSelect = '#ff0000'
-let tool = 'draw'
-let isDrawing = false
+
 
 const colors = ['#ffebee', '#ffcdd2', '#ef9a9a', '#e57373', '#ef5350', '#f44336', '#e53935', '#d32f2f', '#c62828', '#b71c1c',
   '#fce4ec', '#f8bbd0', '#f48fb1', '#f06292', '#ec407a', '#e91e63', '#d81b60', '#c2185b', '#ad1457', '#880e4f',
@@ -56,15 +54,19 @@ const App = () => {
   let gridctx
   let params = {}
 
+  let colorSelect = '#ff0000'
+  let tool = 'draw'
+  let isDrawing = false
+
   document.addEventListener("DOMContentLoaded", () => {
-    console.log('started')
+    // console.log('started')
     canvas = document.getElementById('canvas')
     ctx = canvas.getContext('2d')
     rect = canvas.getBoundingClientRect()
     gridCanvas = document.getElementById('gridcanvas')
     gridctx = gridCanvas.getContext('2d')
     params = {canvas, ctx, rect, canvasWidth, canvasHeight, size}
-    console.log(params)
+    // console.log(params)
 
     canvas.addEventListener("touchstart", touchStart, false);
     canvas.addEventListener("touchend", touchEnd, false);
@@ -79,20 +81,21 @@ const App = () => {
   // Set up touch events for mobile, etc
   const touchStart = (e) => {
     const touch = e.touches[0];
+    // console.log(e.touches[0])
     const location = { x: Math.floor((touch.clientX - rect.left) / size), y: Math.floor((touch.clientY - rect.top) / size) }
     const col = getColor(location, params)
-    console.log('touch start',location, ctx)
+    // console.log('touch start',location, ctx)
     isDrawing = true
     if (!(col===colorSelect) || tool==='erase') {
       lastLoc = location
-      const vals = toolHandler(e, params, tool, colorSelect)
+      const vals = toolHandler(touch, params, tool, colorSelect)
       colorSelect = vals.colorSelect
       tool = vals.tool
     }
   }
 
   const touchEnd = (e) => {
-    console.log('touch end')
+    // console.log('touch end')
     e.preventDefault()
     isDrawing = false
   };
@@ -102,11 +105,11 @@ const App = () => {
       const touch = e.touches[0];
       const location = { x: Math.floor((touch.clientX - rect.left) / size), y: Math.floor((touch.clientY - rect.top) / size) }
       const col = getColor(location, params)
-      console.log('touch move',location, ctx)
+      // console.log('touch move',location, ctx)
       if (!(col===colorSelect) || tool==='erase') {
         if (!(lastLoc.x === location.x && lastLoc.y === location.y) || tool==='erase') {
           lastLoc = location
-          const vals = toolHandler(e, params, tool, colorSelect)
+          const vals = toolHandler(touch, params, tool, colorSelect)
           colorSelect = vals.colorSelect
           tool = vals.tool
         }
@@ -118,7 +121,7 @@ const App = () => {
     const location = { x: Math.floor((e.clientX - rect.left) / size), y: Math.floor((e.clientY - rect.top) / size) }
     const col = getColor(location, params)
     isDrawing = true
-    console.log('mouse',location, ctx)
+    // console.log('mouse',location, ctx, e)
     if (!(col===colorSelect) || tool==='erase') {
       lastLoc = location
       const vals = toolHandler(e, params, tool, colorSelect)
