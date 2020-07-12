@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/PixelPerfect/static/css/main.b7df360c.chunk.css",
-    "main.js": "/PixelPerfect/static/js/main.28056fa0.chunk.js",
-    "main.js.map": "/PixelPerfect/static/js/main.28056fa0.chunk.js.map",
+    "main.js": "/PixelPerfect/static/js/main.431ac0fd.chunk.js",
+    "main.js.map": "/PixelPerfect/static/js/main.431ac0fd.chunk.js.map",
     "runtime-main.js": "/PixelPerfect/static/js/runtime-main.b791c6eb.js",
     "runtime-main.js.map": "/PixelPerfect/static/js/runtime-main.b791c6eb.js.map",
     "static/js/2.1b03d41b.chunk.js": "/PixelPerfect/static/js/2.1b03d41b.chunk.js",
     "static/js/2.1b03d41b.chunk.js.map": "/PixelPerfect/static/js/2.1b03d41b.chunk.js.map",
     "index.html": "/PixelPerfect/index.html",
-    "precache-manifest.8c1796ff74b8227398b86f5fe94b1ea2.js": "/PixelPerfect/precache-manifest.8c1796ff74b8227398b86f5fe94b1ea2.js",
+    "precache-manifest.a793e2b37d410bb98452ef3186babfa8.js": "/PixelPerfect/precache-manifest.a793e2b37d410bb98452ef3186babfa8.js",
     "service-worker.js": "/PixelPerfect/service-worker.js",
     "static/css/main.b7df360c.chunk.css.map": "/PixelPerfect/static/css/main.b7df360c.chunk.css.map",
     "static/js/2.1b03d41b.chunk.js.LICENSE.txt": "/PixelPerfect/static/js/2.1b03d41b.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.b791c6eb.js",
     "static/js/2.1b03d41b.chunk.js",
     "static/css/main.b7df360c.chunk.css",
-    "static/js/main.28056fa0.chunk.js"
+    "static/js/main.431ac0fd.chunk.js"
   ]
 }
