@@ -68,6 +68,10 @@ const App = () => {
     params = {canvas, ctx, rect, canvasWidth, canvasHeight, size}
     // console.log(params)
 
+    document.getElementById('testTouch').addEventListener("touchstart", () => {
+      alert('This is a touch event')
+    }, false);
+
     canvas.addEventListener("touchstart", touchStart, false);
     canvas.addEventListener("touchend", touchEnd, false);
     canvas.addEventListener("touchcancel", touchEnd, false);
@@ -212,6 +216,7 @@ const App = () => {
               <a id='saveButton' download='my-image'><Button variant='info' className='padding' onClick={() => { save() }}>Save Image</Button></a>
             </span>
             <Button variant='primary' className='padding' onClick={() => { tool = 'mirror' }}>Mirror</Button>
+            <Button variant='primary' id="testTouch" className='padding' onClick={() => {}}>Test Touch</Button>
           </div>
         </div>
         <div className='rightcolumn'>
