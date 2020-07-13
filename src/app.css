@@ -6,7 +6,15 @@
 }
 
 .card {
-    padding-left: 20px;
+    padding-left: 1.5em;
+}
+
+.row {
+    width:100%;
+    display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* Clear floats after the columns */
@@ -17,7 +25,7 @@
 }
 
 #gridcanvas {
-    padding-left: 20px;
+    padding-left: 1.5em;
     position:absolute;
     left:0;
     top:0;

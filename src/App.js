@@ -1,9 +1,9 @@
 import React from 'react'
 import { GithubPicker } from 'react-color'
 import './app.css'
-import { Button, Navbar } from 'react-bootstrap'
+import { Button, Navbar, Nav, Dropdown } from 'react-bootstrap'
 
-import { toolHandler, save, clear, getColor } from './Util'
+import { toolHandler, save, clear, getColor, setPixelSize } from './Util'
 
 const size = 25
 const width = 16
@@ -61,19 +61,14 @@ const App = () => {
   let DistanceToTop, DistanceToLeft
 
   document.addEventListener("DOMContentLoaded", () => {
-    // console.log('started')
     canvas = document.getElementById('canvas')
     ctx = canvas.getContext('2d')
     rect = canvas.getBoundingClientRect()
     gridCanvas = document.getElementById('gridcanvas')
     gridctx = gridCanvas.getContext('2d')
-    params = {canvas, ctx, rect, canvasWidth, canvasHeight, size}
-    // console.log(params)
+    params = {canvas, ctx, rect, canvasWidth, canvasHeight, size, width, height}
     DistanceToTop = window.pageYOffset + canvas.getBoundingClientRect().top
     DistanceToLeft = window.pageXOffset + canvas.getBoundingClientRect().left
-    // document.getElementById('testTouch').addEventListener("touchstart", () => {
-    //   alert('This is a touch event')
-    // }, false);
 
     canvas.addEventListener("touchstart", touchStart, false);
     canvas.addEventListener("touchend", touchEnd, false);
@@ -88,11 +83,8 @@ const App = () => {
   // Set up touch events for mobile, etc
   const touchStart = (e) => {
     const touch = e.touches[0];
-    // console.log(e.touches[0])
-    const location = { x: Math.floor((touch.pageX - (DistanceToLeft)) / size), y: Math.floor((touch.pageY - (DistanceToTop)) / size) }
-    // alert('touch'+location.x+ ','+location.y)
+    const location = { x: Math.floor((touch.pageX - (DistanceToLeft)) / params.size), y: Math.floor((touch.pageY - (DistanceToTop)) / params.size) }
     const col = getColor(location, params)
-    console.log('touch start',location, window.scrollX, window.scrollY,canvas.offsetLeft, canvas.offsetTop, DistanceToLeft, DistanceToLeft )
     isDrawing = true
     if (!(col===colorSelect) || tool==='erase') {
       lastLoc = location
@@ -103,7 +95,6 @@ const App = () => {
   }
 
   const touchEnd = (e) => {
-    // console.log('touch end')
     if (e.cancelable) {
       e.preventDefault();
     }
@@ -113,9 +104,8 @@ const App = () => {
   const touchMove = (e) => {
     if (isDrawing) {
       const touch = e.touches[0];
-      const location = { x: Math.floor((touch.pageX - (DistanceToLeft)) / size), y: Math.floor((touch.pageY - (DistanceToTop)) / size) }
+      const location = { x: Math.floor((touch.pageX - (DistanceToLeft)) / params.size), y: Math.floor((touch.pageY - (DistanceToTop)) / params.size) }
       const col = getColor(location, params)
-      // console.log('touch move',location, ctx)
       if (!(col===colorSelect) || tool==='erase') {
         if (!(lastLoc.x === location.x && lastLoc.y === location.y) || tool==='erase') {
           lastLoc = location
@@ -128,11 +118,9 @@ const App = () => {
   }
 
   const mouseDown = (e) => {
-    const location = { x: Math.floor((e.pageX - (DistanceToLeft)) / size), y: Math.floor((e.pageY - (DistanceToTop)) / size) }
+    const location = { x: Math.floor((e.pageX - (DistanceToLeft)) / params.size), y: Math.floor((e.pageY - (DistanceToTop)) / params.size) }
     const col = getColor(location, params)
-    // alert('mouse'+location.x+ ','+location.y)
     isDrawing = true
-    // console.log('mouse',location, ctx, e)
     if (!(col===colorSelect) || tool==='erase') {
       lastLoc = location
       const vals = toolHandler(e, params, tool, colorSelect)
@@ -145,7 +133,7 @@ const App = () => {
   }
   const mouseMove = (e) => {
     if (isDrawing) {
-      const location = { x: Math.floor((e.pageX - (DistanceToLeft)) / size), y: Math.floor((e.pageY - (DistanceToTop)) / size) }
+      const location = { x: Math.floor((e.pageX - (DistanceToLeft)) / params.size), y: Math.floor((e.pageY - (DistanceToTop)) / params.size) }
       const col = getColor(location, params)
       if (!(col===colorSelect) || tool==='erase') {
         if (!(lastLoc.x === location.x && lastLoc.y === location.y) || tool==='erase') {
@@ -171,20 +159,20 @@ const App = () => {
   }
 
   const toggleGrid = () => {
-    gridctx.clearRect(0, 0, canvasWidth, canvasHeight)
+    {gridctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight)}
     if (!grid) {
       grid = true
       for (let x = 0; x <= width; x++) {
         gridctx.beginPath()
-        gridctx.moveTo(x * (size), 0)
-        gridctx.lineTo(x * (size), canvasHeight)
+        gridctx.moveTo(x * (params.size), 0)
+        gridctx.lineTo(x * (params.size), params.canvasHeight)
         gridctx.strokeStyle = '#000000'
         gridctx.stroke()
       }
       for (let y = 0; y <= height; y++) {
         gridctx.beginPath()
-        gridctx.moveTo(0, y * (size))
-        gridctx.lineTo(canvasWidth, y * (size))
+        gridctx.moveTo(0, y * (params.size))
+        gridctx.lineTo(params.canvasWidth, y * (params.size))
         ctx.strokeStyle = '#000000'
         gridctx.stroke()
       }
@@ -198,6 +186,29 @@ const App = () => {
       <Navbar bg='light' expand='lg'>
         <Navbar.Brand href='#home'>Pixel Perfect by MemeLords</Navbar.Brand>
         <Navbar.Toggle aria-controls='basic-navbar-nav' />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav>
+            <Nav.Item>
+              <a id='saveButton' download='my-image'><Button variant='info' className='padding' onClick={() => { save(canvas) }}>Save Image</Button></a>
+            </Nav.Item>
+            {/*<Nav.Item>*/}
+            {/*  <Dropdown onSelect={(key)=>{gridctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight);*/}
+            {/*    grid = false; setPixelSize(params,key)}}>*/}
+            {/*    <Dropdown.Toggle variant="success" id="dropdown-basic">*/}
+            {/*      Pixel Size*/}
+            {/*    </Dropdown.Toggle>*/}
+            {/*    <Dropdown.Menu>*/}
+            {/*      <Dropdown.Item eventKey={15}>15</Dropdown.Item>*/}
+            {/*      <Dropdown.Item eventKey={20}>20</Dropdown.Item>*/}
+            {/*      <Dropdown.Item eventKey={25}>25</Dropdown.Item>*/}
+            {/*      <Dropdown.Item eventKey={30}>30</Dropdown.Item>*/}
+            {/*      <Dropdown.Item eventKey={35}>35</Dropdown.Item>*/}
+            {/*      <Dropdown.Item eventKey={40}>40</Dropdown.Item>*/}
+            {/*    </Dropdown.Menu>*/}
+            {/*  </Dropdown>*/}
+            {/*</Nav.Item>*/}
+          </Nav>
+        </Navbar.Collapse>
       </Navbar>
       <div className='row'>
         <div className='leftcolumn'>
@@ -220,10 +231,8 @@ const App = () => {
             <span>
               <Button variant='warning' className='padding' onClick={(e) => { undoButton(e) }}>Undo</Button>
               <Button variant='success' className='padding' onClick={(e) => { redoButton(e) }}>Redo</Button>
-              <a id='saveButton' download='my-image'><Button variant='info' className='padding' onClick={() => { save() }}>Save Image</Button></a>
             </span>
             <Button variant='primary' className='padding' onClick={() => { tool = 'mirror' }}>Mirror</Button>
-            <Button variant='primary' id="testTouch" className='padding' onClick={() => {}}>Test Touch</Button>
           </div>
         </div>
         <div className='rightcolumn'>

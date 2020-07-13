@@ -5,10 +5,47 @@ export const clear = (params) => {
   params.ctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight)
   return 'draw'
 }
-export const save = () => {
-  const canvas = document.getElementById('canvas')
-  document.getElementById('saveButton').href = canvas.toDataURL()
+export const setPixelSize = (params, newSize) => {
+  const temp_canvas = document.createElement('canvas')
+  const temp_ctx = temp_canvas.getContext('2d')
+  temp_canvas.width = params.width*newSize
+  temp_canvas.height = params.height*newSize
+  params.size = newSize
+  temp_ctx.drawImage(params.canvas,0,0,params.width*newSize,params.height*newSize)
+  params.canvas.width = params.width*newSize
+  params.canvas.height = params.height*newSize
+  params.ctx.drawImage(temp_canvas, 0, 0)
+
 }
+
+export const save = (canvas, arg) => {
+  console.log(arg)
+  const link = document.getElementById('saveButton')
+  canvas.toBlob(function(blob){
+    link.href = URL.createObjectURL(blob);
+    console.log(blob);
+    console.log(link.href); // this line should be here
+    // const newImg = document.createElement('img'), url = URL.createObjectURL(blob);
+    // newImg.style.padding = '.5em'
+    // newImg.onload = function() {
+    //   // no longer need to read the blob so it's revoked
+    //   URL.revokeObjectURL(url);
+    // };
+    // newImg.src = url;
+    // newImg.width = (16*35)
+    // newImg.height = (16*35)
+    // const createA = document.createElement('a');
+    // const createAText = document.createTextNode('Download');
+    // createA.setAttribute('download','test-image')
+    // createA.setAttribute('href','#')
+    // createA.setAttribute('onClick',()=> {console.log('hi')})
+    // createA.appendChild(createAText);
+    // document.body.appendChild(newImg);
+    // document.body.appendChild(createA);
+
+  },'image/png');
+}
+
 export const rgbToHex = (r, g, b) => {
   if (r > 255 || g > 255 || b > 255) { throw 'Invalid color component' }
   return ((r << 16) | (g << 8) | b).toString(16)
