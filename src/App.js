@@ -3,7 +3,7 @@ import { GithubPicker } from 'react-color'
 import './app.css'
 import { Button, Navbar, Nav, Dropdown } from 'react-bootstrap'
 
-import { toolHandler, save, clear, getColor, setPixelSize } from './Util'
+import { toolHandler, save, clear, getColor, setPixelSize, setCanvasWidth, setCanvasHeight } from './Util'
 
 const size = 25
 const width = 16
@@ -66,7 +66,7 @@ const App = () => {
     rect = canvas.getBoundingClientRect()
     gridCanvas = document.getElementById('gridcanvas')
     gridctx = gridCanvas.getContext('2d')
-    params = {canvas, ctx, rect, canvasWidth, canvasHeight, size, width, height}
+    params = {canvas, ctx, rect, canvasWidth, canvasHeight, size, width, height, gridCanvas, gridctx}
     DistanceToTop = window.pageYOffset + canvas.getBoundingClientRect().top
     DistanceToLeft = window.pageXOffset + canvas.getBoundingClientRect().left
 
@@ -158,23 +158,23 @@ const App = () => {
     tool = vals.tool
   }
 
-  const toggleGrid = () => {
-    {gridctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight)}
+  const toggleGrid = (params) => {
+    {params.gridctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight)}
     if (!grid) {
       grid = true
-      for (let x = 0; x <= width; x++) {
-        gridctx.beginPath()
-        gridctx.moveTo(x * (params.size), 0)
-        gridctx.lineTo(x * (params.size), params.canvasHeight)
-        gridctx.strokeStyle = '#000000'
-        gridctx.stroke()
+      for (let x = 0; x <= params.width; x++) {
+        params.gridctx.beginPath()
+        params.gridctx.moveTo(x * (params.size), 0)
+        params.gridctx.lineTo(x * (params.size), params.canvasHeight)
+        params.gridctx.strokeStyle = '#000000'
+        params.gridctx.stroke()
       }
-      for (let y = 0; y <= height; y++) {
-        gridctx.beginPath()
-        gridctx.moveTo(0, y * (params.size))
-        gridctx.lineTo(params.canvasWidth, y * (params.size))
-        ctx.strokeStyle = '#000000'
-        gridctx.stroke()
+      for (let y = 0; y <= params.height; y++) {
+        params.gridctx.beginPath()
+        params.gridctx.moveTo(0, y * (params.size))
+        params.gridctx.lineTo(params.canvasWidth, y * (params.size))
+        params.gridctx.strokeStyle = '#000000'
+        params.gridctx.stroke()
       }
     } else {
       grid = false
@@ -191,22 +191,62 @@ const App = () => {
             <Nav.Item>
               <a id='saveButton' download='my-image'><Button variant='info' className='padding' onClick={() => { save(canvas) }}>Save Image</Button></a>
             </Nav.Item>
-            {/*<Nav.Item>*/}
-            {/*  <Dropdown onSelect={(key)=>{gridctx.clearRect(0, 0, params.canvasWidth, params.canvasHeight);*/}
-            {/*    grid = false; setPixelSize(params,key)}}>*/}
-            {/*    <Dropdown.Toggle variant="success" id="dropdown-basic">*/}
-            {/*      Pixel Size*/}
-            {/*    </Dropdown.Toggle>*/}
-            {/*    <Dropdown.Menu>*/}
-            {/*      <Dropdown.Item eventKey={15}>15</Dropdown.Item>*/}
-            {/*      <Dropdown.Item eventKey={20}>20</Dropdown.Item>*/}
-            {/*      <Dropdown.Item eventKey={25}>25</Dropdown.Item>*/}
-            {/*      <Dropdown.Item eventKey={30}>30</Dropdown.Item>*/}
-            {/*      <Dropdown.Item eventKey={35}>35</Dropdown.Item>*/}
-            {/*      <Dropdown.Item eventKey={40}>40</Dropdown.Item>*/}
-            {/*    </Dropdown.Menu>*/}
-            {/*  </Dropdown>*/}
-            {/*</Nav.Item>*/}
+            <Nav.Item>
+              <Dropdown onSelect={(key)=>{gridCanvas.width = gridCanvas.width;
+                grid = false; setPixelSize(params,key)}}>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  Pixel Size (WIP)
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item eventKey={15}>15</Dropdown.Item>
+                  <Dropdown.Item eventKey={20}>20</Dropdown.Item>
+                  <Dropdown.Item eventKey={25}>25</Dropdown.Item>
+                  <Dropdown.Item eventKey={30}>30</Dropdown.Item>
+                  <Dropdown.Item eventKey={35}>35</Dropdown.Item>
+                  <Dropdown.Item eventKey={40}>40</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Nav.Item>
+            <Nav.Item>
+              <Dropdown onSelect={(key)=>{
+                grid = false; setCanvasWidth(params,key)}}>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  Canvas Width (WIP)
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item eventKey={16}>16</Dropdown.Item>
+                  <Dropdown.Item eventKey={20}>20</Dropdown.Item>
+                  <Dropdown.Item eventKey={25}>25</Dropdown.Item>
+                  <Dropdown.Item eventKey={30}>30</Dropdown.Item>
+                  <Dropdown.Item eventKey={35}>35</Dropdown.Item>
+                  <Dropdown.Item eventKey={40}>40</Dropdown.Item>
+                  <Dropdown.Item eventKey={45}>45</Dropdown.Item>
+                  <Dropdown.Item eventKey={50}>50</Dropdown.Item>
+                  <Dropdown.Item eventKey={55}>55</Dropdown.Item>
+                  <Dropdown.Item eventKey={60}>60</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Nav.Item>
+            <Nav.Item>
+              <Dropdown onSelect={(key)=>{
+                grid = false; setCanvasHeight(params,key)}}>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  Canvas Height (WIP)
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item eventKey={16}>16</Dropdown.Item>
+                  <Dropdown.Item eventKey={20}>20</Dropdown.Item>
+                  <Dropdown.Item eventKey={25}>25</Dropdown.Item>
+                  <Dropdown.Item eventKey={30}>30</Dropdown.Item>
+                  <Dropdown.Item eventKey={35}>35</Dropdown.Item>
+                  <Dropdown.Item eventKey={40}>40</Dropdown.Item>
+                  <Dropdown.Item eventKey={45}>45</Dropdown.Item>
+                  <Dropdown.Item eventKey={50}>50</Dropdown.Item>
+                  <Dropdown.Item eventKey={55}>55</Dropdown.Item>
+                  <Dropdown.Item eventKey={60}>60</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Nav.Item>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -253,7 +293,7 @@ const App = () => {
           </div>
           <div className='card'>
             <span>
-              <Button variant='info' className='padding' onClick={() => { toggleGrid() }}>Toggle Grid</Button>
+              <Button variant='info' className='padding' onClick={() => { toggleGrid(params) }}>Toggle Grid</Button>
               <span className='clear'>
                 <Button variant='danger' className='padding' onClick={() => { tool = clear(params) }}>Clear</Button>
               </span>

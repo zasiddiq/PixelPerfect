@@ -8,41 +8,49 @@ export const clear = (params) => {
 export const setPixelSize = (params, newSize) => {
   const temp_canvas = document.createElement('canvas')
   const temp_ctx = temp_canvas.getContext('2d')
-  temp_canvas.width = params.width*newSize
-  temp_canvas.height = params.height*newSize
+  params.canvasWidth = params.width*newSize
+  params.canvasHeight = params.height*newSize
+  temp_canvas.width = params.canvasWidth
+  temp_canvas.height = params.canvasHeight
+  params.gridCanvas.width = params.canvasWidth
+  params.gridCanvas.height = params.canvasHeight
   params.size = newSize
   temp_ctx.drawImage(params.canvas,0,0,params.width*newSize,params.height*newSize)
   params.canvas.width = params.width*newSize
   params.canvas.height = params.height*newSize
   params.ctx.drawImage(temp_canvas, 0, 0)
-
+  console.log(params)
+}
+export const setCanvasWidth = (params, newWidth) => {
+  const temp_canvas = document.createElement('canvas')
+  const temp_ctx = temp_canvas.getContext('2d')
+  temp_canvas.width = params.size*newWidth
+  temp_canvas.height = params.canvasHeight
+  temp_ctx.drawImage(params.canvas,0,0,)
+  params.canvasWidth = params.size*newWidth
+  params.gridCanvas.width = params.size*newWidth
+  params.width = newWidth
+  params.canvas.width = params.size*newWidth
+  params.ctx.drawImage(temp_canvas, 0, 0)
+}
+export const setCanvasHeight = (params, newHeight) => {
+  const temp_canvas = document.createElement('canvas')
+  const temp_ctx = temp_canvas.getContext('2d')
+  temp_canvas.width = params.canvasWidth
+  temp_canvas.height = params.size*newHeight
+  temp_ctx.drawImage(params.canvas,0,0,)
+  params.canvasHeight = params.size*newHeight
+  params.gridCanvas.height = params.size*newHeight
+  params.height = newHeight
+  params.canvas.width = params.canvasWidth
+  params.canvas.height = params.size*newHeight
+  params.ctx.drawImage(temp_canvas, 0, 0)
 }
 
 export const save = (canvas, arg) => {
-  console.log(arg)
   const link = document.getElementById('saveButton')
   canvas.toBlob(function(blob){
     link.href = URL.createObjectURL(blob);
-    console.log(blob);
-    console.log(link.href); // this line should be here
-    // const newImg = document.createElement('img'), url = URL.createObjectURL(blob);
-    // newImg.style.padding = '.5em'
-    // newImg.onload = function() {
-    //   // no longer need to read the blob so it's revoked
-    //   URL.revokeObjectURL(url);
-    // };
-    // newImg.src = url;
-    // newImg.width = (16*35)
-    // newImg.height = (16*35)
-    // const createA = document.createElement('a');
-    // const createAText = document.createTextNode('Download');
-    // createA.setAttribute('download','test-image')
-    // createA.setAttribute('href','#')
-    // createA.setAttribute('onClick',()=> {console.log('hi')})
-    // createA.appendChild(createAText);
-    // document.body.appendChild(newImg);
-    // document.body.appendChild(createA);
-
   },'image/png');
 }
 
@@ -119,7 +127,7 @@ export const toolHandler = (e, params, tool, colorSelect) => {
       }
       return { colorSelect, tool }
     case 'picker':
-      colorSelect = getAlpha(location, params)
+      colorSelect = getColor(location, params)
       tool = 'draw'
       return { colorSelect, tool }
     default:
