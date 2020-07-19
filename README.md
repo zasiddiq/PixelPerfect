@@ -9,8 +9,8 @@ It was made using ReactJS and Bootstrap. All drawing is accomplished with the HT
 | Erase | Erases the selected pixel |
 | Fill | Fills the selected available region with the selected color. Uses Flood-fill algorithm. |
 | Picker | Selects a color on the canvas |
-| Undo | Undos the previous action |
-| Redo | Redos the last undo action |
+| Undo | Undo the previous action |
+| Redo | Redo the last undo action |
 | Mirror | Draws selected color mirrored across the Y-axis |
 | Save Image | Save Canvas in PNG format |
 | Toggle Grid | Toggles a grid overlay on the canvas |
