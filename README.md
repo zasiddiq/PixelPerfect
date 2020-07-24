@@ -1,6 +1,6 @@
 # Pixel Perfect - Project made in ShipIT XX
 
-Pixel Perfect is a web app that allows you to create pixel art. It was made during a 24-Hour Hackathon, ShipIT XX, and won **3rd Place** and **Best Presentation**. It is available for demo [here](https://tristantyler.github.io/PixelPerfect/)
+Pixel Perfect is a web app that allows you to create pixel art. It was made during a 24-Hour Hackathon, ShipIT XX, and won **3rd Place** and **Best Presentation**. It is available for demo [here](https://codebyzain.com/PixelPerfect/)
 
 It was made using ReactJS and Bootstrap. All drawing is accomplished with the HTML canvas tag
 | Tools | Description |
