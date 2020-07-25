@@ -184,7 +184,7 @@ const App = () => {
   return (
     <div>
       <Navbar bg='light' expand='lg'>
-        <Navbar.Brand href='#home'>Pixel Perfect</Navbar.Brand>
+        <Navbar.Brand href='#home'>Test New Title</Navbar.Brand>
         <Navbar.Toggle aria-controls='basic-navbar-nav' />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav>
